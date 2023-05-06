@@ -11,4 +11,8 @@
       <AdditionalFiles Include="Views\Account\Privacy.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="datatables.net" Version="1.13.4" />
+    </ItemGroup>
+
 </Project>

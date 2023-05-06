@@ -29,6 +29,7 @@ async function initTable() {
     getData();
 }
 
+
 async function getData() {
     try {
         let queryRef = query(usersRef, orderBy("name"));
@@ -46,7 +47,7 @@ async function getData() {
                 data.email,
                 data.birthdate,
                 `<img src="${data.photoUrl}" alt="User Photo" class="user-photo"/>`
-            ]);
+            ]).node().classList.add('table-dark'); // add the table-dark class to the row
         });
 
         // Redraw the table to update the pagination
@@ -55,6 +56,7 @@ async function getData() {
         console.error("Error getting documents:", err);
     }
 }
+
 
 // Call the initTable function to initialize the table
 initTable();
