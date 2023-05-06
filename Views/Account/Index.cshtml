@@ -5,56 +5,77 @@
 <html>
 <head>
     <style>
-        .card {
-            max-width: 400px;
-            margin: 0 auto;
-            border-radius: 10px;
-            border: none;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-        .card-body {
-            padding: 2rem 2rem 3rem 2rem; /* add padding to top and bottom */
-        }
-        .google-btn {
-            background-color: transparent;
-            border: none;
-            box-shadow: none;
-            padding: 0;
-            display: inline-block;
-            cursor: pointer;
-            transition: all .3s;
-        }
-        .google-btn:hover {
-            background-color: #f5f5f5;
-        }
-        .google-btn .google-icon-wrapper {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .google-btn .google-icon {
-            width: 18px;
-            height: 18px;
-        }
-        .toggle-password {
-            cursor: pointer;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-        }
-    </style>
+       .card {
+           max-width: 400px;
+           border-radius: 10px;
+           border: none;
+           box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+           margin: 0 auto 20px;
+
+       }
+       .card-body {
+           padding: 2rem 2rem 3rem 2rem;
+       }
+       .google-btn {
+           background-color: transparent;
+           border: none;
+           box-shadow: none;
+           padding: 0;
+           display: inline-block;
+           cursor: pointer;
+           transition: all .3s;
+       }
+       .google-btn:hover {
+           background-color: #f5f5f5;
+           box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+       }
+       .google-btn .google-icon-wrapper {
+           width: 50px;
+           height: 50px;
+           border-radius: 50%;
+           background-color: #fff;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+       }
+       .google-btn .google-icon {
+           width: 18px;
+           height: 18px;
+       }
+       .toggle-password {
+           cursor: pointer;
+           position: absolute;
+           right: 10px;
+           top: 50%;
+           transform: translateY(-50%);
+           color: #aaa;
+       }
+       .btn-primary:hover {
+           background-color: #007bff;
+       }
+       .btn-secondary:hover {
+           background-color: #6c757d;
+       }
+       .form-check-label:hover {
+           color: #007bff;
+       }
+       .container {
+         margin-top: 50px;
+       }
+           
+       .form-group {
+         margin-bottom: 1.5rem;
+       }
+   
+   </style>
 </head>
 <body>
 <div class="container py-5">
 
     <div class="card text-white bg-dark mb-3" style="max-width: 20rem;">
-        @* <div class="card-header">Hoş Geldiniz!</div> *@
+        <div class="card-header bg-dark text-white" style="padding: 1rem; border-bottom: 1px solid #fff;">
+            <h3 class="card-title">Merhaba!</h3>
+        </div>
         <div class="card-body">
             <h5 class="card-title">Giriş Yap</h5>
             <form>
@@ -80,6 +101,11 @@
                 </div>
                 <button type="submit" id="loginButton" class="btn btn-primary btn-block mb-3">Giriş Yap</button>
                 <a href="#" class="btn btn-secondary btn-block mb-3">Kayıt Ol</a>
+                <div class="g-signin2 google-btn" id="google-sign-in">
+                    <div class="google-icon-wrapper">
+                        <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+                    </div>
+                </div>
                 <div class="alert alert-danger d-none my-3" id="login-error" role="alert">
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     <strong>Hata!</strong> <a href="#" class="alert-link">Lütfen e-posta ve şifrenizi kontrol edip tekrar deneyin.</a>
@@ -88,11 +114,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     <strong>Başarılı!</strong> <a href="#" class="alert-link">Kafe yönetim sayfasına yönlendiriliyorsunuz.</a>
                 </div>
-                <div class="g-signin2 google-btn" id="google-sign-in">
-                    <div class="google-icon-wrapper">
-                        <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
-                    </div>
-                </div>
+
             </form>
         </div>
     </div>

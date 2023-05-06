@@ -9,4 +9,16 @@ public class CafeManagement : Controller
     {
         return View();
     }
+    public IActionResult Customers()
+    {
+        return View("Customers");
+    }
+    public IActionResult Payment()
+    {
+        return View("Payment");
+    }
+    public IActionResult Products()
+    {
+        return View("Products");
+    }
 }

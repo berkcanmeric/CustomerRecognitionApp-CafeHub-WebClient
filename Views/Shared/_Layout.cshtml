@@ -58,6 +58,7 @@
 <div class="container">
     <main role="main" class="pb-3">
         @RenderBody()
+        <a id="back-to-top" href="#" class="btn btn-light btn-lg back-to-top" role="button"><i class="fas fa-chevron-up"></i></a>
     </main>
 </div>
 
@@ -69,6 +70,7 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+<script src="/js/scrollToTop.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
