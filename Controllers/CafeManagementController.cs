@@ -2,7 +2,7 @@
 
 namespace CafeHUBWebV2.Controllers;
 
-public class CafeManagement : Controller
+public class CafeManagementController : Controller
 {
     // GET
     public IActionResult Index()
