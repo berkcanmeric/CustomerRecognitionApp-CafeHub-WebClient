@@ -25,17 +25,6 @@ const newProductRef = doc(productsRef);
 // Get a reference to the table element
 const table = document.getElementById("product-table");
 
-
-// // Add the table headers
-// const headerRow = table.insertRow();
-// headerRow.insertCell().textContent = "Name";
-// headerRow.insertCell().textContent = "Category";
-// headerRow.insertCell().textContent = "Price";
-// // headerRow.insertCell().textContent = "Best Selling";
-// headerRow.insertCell().textContent = "Image";
-// headerRow.insertCell(); // Empty cell for the edit button
-// headerRow.insertCell(); // Empty cell for the delete button
-
 async function getData() {
     try {
         const querySnapshot = await getDocs(productsRef);
@@ -49,7 +38,7 @@ async function getData() {
         function createButtonAndAppendToCell(buttonText, buttonClass, cell, clickHandler) {
             const button = document.createElement("button");
             button.innerHTML = buttonText;
-            button.classList.add(buttonClass);
+            button.className = buttonClass;
             cell.appendChild(button);
             button.addEventListener("click", clickHandler);
         }
@@ -59,26 +48,35 @@ async function getData() {
             console.log(`${modalId} modal opened`);
             const modal = document.getElementById(modalId);
             modal.style.display = "block";
-            const closeButton = modal.getElementsByClassName("close")[0];
+            const closeButton = modal.getElementsByClassName("btn-close")[0];
             closeButton.removeEventListener("click", closeModal);
             closeButton.addEventListener("click", closeModal);
-
+            const closeButtonSecondary = modal.querySelector("#close-btn");
+            closeButtonSecondary.removeEventListener("click", closeModal);
+            closeButtonSecondary.addEventListener("click", closeModal);
             function closeModal() {
                 modal.style.display = "none";
             }
         }
-
+      
         // Function to pre-fill the edit form with product data and open the edit modal
         function openEditModal(docc, data) {
             console.log("Edit button clicked");
             const editForm = document.getElementById("edit-form");
             editForm.elements.name.value = data.name;
-            editForm.elements.category.value = data.category;
             editForm.elements.price.value = data.price;
+            editForm.elements.category.value = data.category;
             // editForm.elements.bestSelling.value = data.bestSelling.checked;
             editForm.elements.imageUrl.value = data.imageUrl;
             editForm.dataset.docId = docc.id;
             openModal("edit-modal");
+        }
+
+        function openDeleteModal(productId) {
+            console.log("Delete button clicked");
+            const deleteForm = document.getElementById("delete-form");
+            deleteForm.dataset.docId = productId;
+            openModal("delete-modal");
         }
 
         // Function to delete a product and reload the table data
@@ -140,36 +138,41 @@ async function getData() {
             const data = docc.data();
             const row = $('#product-table').DataTable().row.add([
                 data.name,
-                data.category,
                 data.price,
+                data.category,
                 `<img src="${data.imageUrl}" alt="Product Image" class="product-image"/>`
             ]).draw().node();
 
             const editCell = $('#product-table').DataTable().cell(row, 4).node();
-            createButtonAndAppendToCell('Düzenle', 'edit-button', editCell, () => {
+            createButtonAndAppendToCell('Düzenle', 'btn btn-primary btn-sm', editCell, () => {
                 openEditModal(docc, data);
             });
 
             const deleteCell = $('#product-table').DataTable().cell(row, 5).node();
-            createButtonAndAppendToCell('Sil', 'delete-button', deleteCell, () => {
-                deleteProductData(docc.id);
+            createButtonAndAppendToCell('Sil', 'btn btn-danger btn-sm', deleteCell, () => {
+                openDeleteModal(docc.id);
             });
         });
 
         // Replace the existing add button with a new one and add an event listener
         const oldAddButton = document.getElementById("add-button");
         const newAddButton = oldAddButton.cloneNode(true);
+        newAddButton.id = "add-button";
         oldAddButton.parentNode.replaceChild(newAddButton, oldAddButton);
         newAddButton.addEventListener("click", openAddModal);
-        newAddButton.id = "add-button";
 
         // Clone and replace the existing edit form and add form
         const oldEditForm = document.getElementById("edit-form");
         const newEditForm = oldEditForm.cloneNode(true);
         oldEditForm.parentNode.replaceChild(newEditForm, oldEditForm);
+
         const oldAddForm = document.getElementById("add-form");
         const newAddForm = oldAddForm.cloneNode(true);
         oldAddForm.parentNode.replaceChild(newAddForm, oldAddForm);
+
+        const oldDeleteForm = document.getElementById("delete-form");
+        const newDeleteForm = oldDeleteForm.cloneNode(true);
+        oldDeleteForm.parentNode.replaceChild(newDeleteForm, oldDeleteForm);
 
         replaceForm(
             document.getElementById("edit-form"),
@@ -184,6 +187,12 @@ async function getData() {
             "add",
             submitAddForm
         );
+        replaceForm(
+            document.getElementById("delete-form"),
+            newDeleteForm,
+            "delete",
+            submitDeleteForm
+        );
 
         async function submitEditForm() {
             event.preventDefault();
@@ -191,8 +200,8 @@ async function getData() {
             // Get the edited product data from the form
             const editedData = {
                 name: newEditForm.elements.name.value,
-                category: newEditForm.elements.category.value,
                 price: Number(newEditForm.elements.price.value),
+                category: newEditForm.elements.category.value,
                 // bestSelling: newEditForm.elements.bestSelling.checked,
                 imageUrl: newEditForm.elements.imageUrl.value,
             };
@@ -210,21 +219,11 @@ async function getData() {
                 await getData();
                 console.log("Table data reloaded");
                 // Display a success message to inform the user that the product has been updated
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Ürün başarıyla güncellendi',
-                    text: 'Ürün veritabanında güncellendi.',
-                    timer: 1500,
-                    timerProgressBar: true
-                });
+                showToast('Ürün veritabanında güncellendi.', 'success');
             } catch (err) {
                 console.error("Error updating document:", err);
                 // Show an error message to inform the user that there was a problem updating the product
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Ürün güncelleme hatası',
-                    text: 'Ürün güncelleme sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
-                });
+                showToast('Ürün güncelleme sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
             }
         }
 
@@ -234,8 +233,8 @@ async function getData() {
             // Get the new product data from the form
             const newData = {
                 name: newAddForm.elements.name.value,
-                category: newAddForm.elements.category.value,
                 price: Number(newAddForm.elements.price.value),
+                category: newAddForm.elements.category.value,
                 bestSelling: false, // Set bestSelling to false by default
                 imageUrl: newAddForm.elements.imageUrl.value,
             };
@@ -246,39 +245,76 @@ async function getData() {
             console.log("Product exists: ", exists);
             if (exists) {
                 // Display a message to inform the user that the product already exists
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Ürün zaten mevcut',
-                    text: 'Bu isimde bir ürün zaten bu kategoride mevcut. Lütfen farklı bir isim girin.'
-                });
+                showToast('Bu isimde bir ürün zaten bu kategoride mevcut. Lütfen farklı bir isim girin.');
             } else {
                 try {
                     // Add the new product data to the Product subcollection of a specific Cafe document with a random ID
                     await setDoc(newProductRef, newData);
                     console.log("New product data added successfully");
+                    // Close the modal
+                    const modal = document.getElementById("add-modal");
+                    modal.style.display = "none";
+                    await getData();
+                    console.log("Table data reloaded");
                     // Show a success message to inform the user that the new product has been added
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Ürün başarıyla eklendi',
-                        text: 'Yeni ürün veritabanına eklendi.',
-                        timer: 1500,
-                        timerProgressBar: true
-                    }).then(() => {
-                        console.log('Ürün sayfasına yönlendiriliyor...');
-                        window.location.href = "/CafeManagement/Products";
-                    });
+                    showToast('Yeni ürün veritabanına eklendi.', 'success');
+
                 } catch (err) {
                     console.error("Error adding document:", err);
                     // Show an error message to inform the user that there was a problem adding the new product
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Ürün ekleme hatası',
-                        text: 'Yeni ürün eklerken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.'
-                    });
+                    showToast('Yeni ürün eklerken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.');
                 }
             }
         }
 
+        async function submitDeleteForm() {
+            event.preventDefault();
+            console.log("Delete form submitted");
+            const docId = newDeleteForm.dataset.docId;
+            console.log("Document ID: ", docId);
+            try {
+                // Get a reference to the product document to delete
+                const productDocRef = doc(productsRef, docId);
+                // Delete the product document
+                await deleteDoc(productDocRef);
+                console.log("Product deleted successfully");
+                // Close the modal
+                const modal = document.getElementById("delete-modal");
+                modal.style.display = "none";
+                // Reload the table data to show the updated product info
+                await getData();
+                console.log("Table data reloaded");
+                // Display a success message to inform the user that the product has been deleted
+                showToast('Ürün veritabanından başarıyla silindi.', 'success');
+            } catch (err) {
+                console.error("Error deleting product:", err);
+                // Show an error message to inform the user that there was a problem deleting the product
+                showToast('Ürünü silerken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+            }
+        }
+
+        function showToast(message, type = 'error') {
+            const toast = document.createElement('div');
+            toast.className = `toast bg-${type}`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            toast.innerHTML = `
+    <div class="toast-header">
+      <strong class="me-auto">${type === 'success' ? 'Başarılı' : 'Hata'}</strong>
+      <button type="button" class="btn-close ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      ${message}
+    </div>
+  `;
+            const container = document.createElement('div');
+            container.className = 'toast-container';
+            container.appendChild(toast);
+            document.body.appendChild(container);
+            const toastInstance = new bootstrap.Toast(toast);
+            toastInstance.show();
+        }
         function replaceForm(oldForm, newForm, formType, submitCallback) {
             // Clone the old form and remove event listeners
             const clonedForm = oldForm.cloneNode(true);

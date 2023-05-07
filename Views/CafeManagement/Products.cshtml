@@ -1,16 +1,255 @@
 ﻿@{
-ViewBag.Title = "Products";
+    //TODO: Table cell gaining focus bug
+    ViewBag.Title = "Products";
 }
 
 <!DOCTYPE html>
-
 <html>
 <head>
-    <title>title</title>
+    <style>
+        .container {
+            margin-top: 2rem;
+        }
+        .product-image {
+            width: 50px; /* Change this value to adjust the size of the photos */
+            height: 50px; /* Change this value to adjust the size of the photos */
+            border-radius: 50%; /* Make the photos circular */
+            object-fit: cover; /* Scale the photos to fit the container */
+        }
+        td{
+            vertical-align: middle; 
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #343a40;
+            color: #fff;
+            border-color: #343a40;
+        }  
+        table.dataTable thead th:first-child {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
+        
+        table.dataTable thead th:last-child {
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+        }
+        .modal-dialog{
+            padding: 3rem;
+        }
+        .toast-success {
+          background-color: #28a745;
+        }
+        
+        .toast-error {
+          background-color: #dc3545;
+        }
+        .toast-container {
+          position: fixed;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+        
+        .toast {
+          width: 400px;
+          margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-<div>
-      
+
+<div class="container">
+    <div class="table-title">
+        <h1>Ürünler</h1>
+    </div>
+    <table class="table table-hover" id="product-table">
+        <thead>
+        <tr class="table-dark">
+            <th scope="col">Ad</th>
+            <th scope="col">Fiyat</th>
+            <th scope="col">Kategori</th>
+            <th scope="col">Resim</th>
+            <th scope="col">Düzenle</th>
+            <th scope="col">Sil</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<!-- Edit Modal -->
+<div id="edit-modal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ürünü Düzenle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+            <form id="edit-form">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="name">Ad:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Fiyat:</label>
+                        <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Kategori:</label>
+                        <input type="text" class="form-control" id="category" name="category" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="imageUrl">Resim URL'si:</label>
+                        <input type="text" class="form-control" id="imageUrl" name="imageUrl" required>
+                    </div>
+                    @* <label for="isBestSelling">En Çok Satan:</label> *@
+                    @* <input type="checkbox" id="isBestSelling" name="isBestSelling"> *@
+
+
+                </div>
+                <div class="modal-footer">
+                    <div class="float-start">
+                        <input type="submit" class="btn btn-primary" value="Düzenle">
+
+                    </div>
+                    <div class="float-end">
+                        <button type="button" id="close-btn" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Add Modal -->
+<div id="add-modal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ürün Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+            <form id="add-form">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="name">Ad:</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Fiyat:</label>
+                        <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Kategori:</label>
+                        <input type="text" class="form-control" id="category" name="category" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="imageUrl">Resim URL'si:</label>
+                        <input type="text" class="form-control" id="imageUrl" name="imageUrl" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="float-start">
+                        <input type="submit" class="btn btn-primary" value="Ekle">
+                    </div>
+                    <div class="float-end">
+                        <button type="button" id="close-btn" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Delete Modal -->
+<div id="delete-modal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ürünü Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bu ürünü silmek istediğinize emin misiniz?</p>
+
+            </div>
+            <div class="modal-footer">
+                <form id="delete-form">
+
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-danger" value="Sil">
+                    </div>
+                </form>
+                <button type="button" id="close-btn" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
+<script>
+$(document).ready(function () {
+    $.noConflict();
+
+    var table = $('#product-table').DataTable({
+        "paging": true,
+        "pageLength": 5,
+        "pagingType": "simple_numbers",
+        "dom": '<"row"<"col-sm-12 text-center"<"h3 mb-0">>>' +
+               '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+               '<"row"<"col-sm-12"tr>>' +
+               '<"row"<"col-sm-12"<"d-flex justify-content-between"p>>>', // Use a container with justify-content-between class
+        "language": {
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries"
+        },
+        "columnDefs": [
+            {
+                "defaultContent": "",
+                "targets": "_all"
+            }
+        ],
+        "drawCallback": function() {
+            // Get the pagination links
+            var pagination = $(this).closest('.dataTables_wrapper').find('.pagination');
+    
+            // Update the class of the li elements
+            pagination.find('li').removeClass('paginate_button').addClass('page-item');
+    
+            // Add the Bootstrap classes to the page links
+            pagination.find('a').addClass('page-link');
+    
+            // Add the "active" class to the current page link
+            pagination.find('.active').addClass('disabled');
+    
+            // Wrap the pagination links in a div with the pagination class
+            pagination.wrap($('<div>', {'class': 'pagination'}));
+
+            // Set tabindex="-1" for all table cells except the last 2 in each row
+            $('table td:not(:nth-last-child(-n+2))').attr('tabindex', '-1');
+        }
+        
+    });
+        // Create the add button
+        var addButton = document.createElement("button");
+        addButton.setAttribute("type", "button");
+        addButton.setAttribute("id", "add-button");
+        addButton.setAttribute("class", "btn btn-primary add-button");
+        addButton.innerHTML = '<i class="fas fa-plus"></i> Ürün Ekle';
+        
+        // Append the add button to the DataTables table
+        var buttonContainer = document.createElement("div");
+        buttonContainer.setAttribute("class", "col-sm-12 d-flex justify-content-between");
+        buttonContainer.appendChild(document.getElementById("product-table_paginate"));
+        buttonContainer.appendChild(addButton);
+        document.getElementById("product-table_wrapper").appendChild(buttonContainer);});
+
+</script>
+<script type="module" src="/lib/firebase/products-page.js?newversion"></script>

@@ -3,14 +3,93 @@
 }
 
 <!DOCTYPE html>
-
 <html>
 <head>
-    <title>title</title>
+    <style>
+        .container {
+            margin-top: 2rem;
+        }
+        .user-photo {
+            width: 50px; /* Change this value to adjust the size of the photos */
+            height: 50px; /* Change this value to adjust the size of the photos */
+            border-radius: 50%; /* Make the photos circular */
+            object-fit: cover; /* Scale the photos to fit the container */
+        }
+        td{
+            vertical-align: middle; 
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #343a40;
+            color: #fff;
+            border-color: #343a40;
+        }  
+        table.dataTable thead th:first-child {
+            border-top-left-radius: 0.375rem;
+            border-bottom-left-radius: 0.375rem;
+        }
+        
+        table.dataTable thead th:last-child {
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+        }
+     
+    </style>
 </head>
 <body>
-<div>
 
+<div class="container">
+    <div class="table-title">
+      <h1>Aktif Müşteriler</h1>
+    </div>
+    <table class="table table-hover" id="customer-table">
+        <thead>
+        <tr class="table-dark">
+            <th scope="col">Ad</th>
+            <th scope="col">Soyad</th>
+            <th scope="col">E-posta</th>
+            <th scope="col">Doğum Tarihi</th>
+            <th scope="col">Fotoğraf</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 </div>
+
 </body>
 </html>
+<script>
+$(document).ready(function () {
+    $.noConflict();
+ var table = $('#customer-table').DataTable({
+     "paging": true,
+     "pageLength": 5,
+     "pagingType": "simple_numbers",
+     "dom": '<"row"<"col-sm-12 text-center"<"h3 mb-0">>>' +
+            '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+            '<"row"<"col-sm-12"tr>>' +
+            '<"row"<"col-sm-12"<"d-flex justify-content-between"p>>>', // Use a container with justify-content-between class
+     "language": {
+         "info": "Showing _START_ to _END_ of _TOTAL_ entries"
+     },
+     "drawCallback": function() {
+         // Get the pagination links
+         var pagination = $(this).closest('.dataTables_wrapper').find('.pagination');
+ 
+         // Update the class of the li elements
+         pagination.find('li').removeClass('paginate_button').addClass('page-item');
+ 
+         // Add the Bootstrap classes to the page links
+         pagination.find('a').addClass('page-link');
+ 
+         // Add the "active" class to the current page link
+         pagination.find('.active').addClass('disabled');
+ 
+         // Wrap the pagination links in a div with the pagination class
+         pagination.wrap($('<div>', {'class': 'pagination'}));
+     }
+ });
+ 
+});
+</script>
+<script type="module" src="/lib/firebase/customer-page.js?newversion"></script>
