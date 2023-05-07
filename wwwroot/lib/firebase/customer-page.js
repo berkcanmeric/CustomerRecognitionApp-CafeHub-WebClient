@@ -47,7 +47,7 @@ async function getData() {
                 data.email,
                 data.birthdate,
                 `<img src="${data.photoUrl}" alt="User Photo" class="user-photo"/>`
-            ]).node().classList.add('table-dark'); // add the table-dark class to the row
+            ]).draw().node();
         });
 
         // Redraw the table to update the pagination

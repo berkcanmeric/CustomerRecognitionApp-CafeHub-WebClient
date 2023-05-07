@@ -15,7 +15,7 @@
             border-radius: 50%; /* Make the photos circular */
             object-fit: cover; /* Scale the photos to fit the container */
         }
-        .td{
+        td{
             vertical-align: middle; 
         }
         .pagination .page-item.active .page-link {
@@ -38,6 +38,9 @@
 <body>
 
 <div class="container">
+    <div class="table-title">
+      <h1>Aktif Müşteriler</h1>
+    </div>
     <table class="table table-hover" id="customer-table">
         <thead>
         <tr class="table-dark">
@@ -49,12 +52,6 @@
         </tr>
         </thead>
         <tbody>
-        @* <tr class="table-dark"> *@
-        @*     <th scope="row">Dark</th> *@
-        @*     <td>Column content</td> *@
-        @*     <td>Column content</td> *@
-        @*     <td>Column content</td> *@
-        @*   </tr> *@
         </tbody>
     </table>
 </div>
@@ -93,8 +90,6 @@ $(document).ready(function () {
      }
  });
  
- // Change the text of the h3 element to "Aktif Müşteriler"
- $("div.h3").html("Aktif Müşteriler");
 });
 </script>
 <script type="module" src="/lib/firebase/customer-page.js?newversion"></script>
