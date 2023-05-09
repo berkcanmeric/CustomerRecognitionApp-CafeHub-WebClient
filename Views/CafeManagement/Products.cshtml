@@ -54,6 +54,14 @@
           width: 400px;
           margin-top: 20px;
         }
+        #categories {
+          display: flex;
+          margin: 5px 5px 5px 0px;
+          justify-content: flex-start;
+        }
+        .category-button {
+          margin: 5px;
+        }
     </style>
 </head>
 <body>
@@ -61,6 +69,9 @@
 <div class="container">
     <div class="table-title">
         <h1>Ürünler</h1>
+        <div id="categories" class="category-container">
+            
+        </div>
     </div>
     <table class="table table-hover" id="product-table">
         <thead>
@@ -207,8 +218,15 @@ $(document).ready(function () {
                '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
                '<"row"<"col-sm-12"tr>>' +
                '<"row"<"col-sm-12"<"d-flex justify-content-between"p>>>', // Use a container with justify-content-between class
+        "lengthMenu": [
+                    [5, 10, 20, 50, 100, -1],
+                    [5, 10, 20, 50, 100, 'All']
+                ],
         "language": {
-            "info": "Showing _START_ to _END_ of _TOTAL_ entries"
+             "zeroRecords": "Herhangi bir ürün bulunamadı.",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "searchPlaceholder": "Ürün ara...",
+             "infoFiltered": "(filtered from _MAX_ total Items)"
         },
         "columnDefs": [
             {
@@ -234,9 +252,9 @@ $(document).ready(function () {
 
             // Set tabindex="-1" for all table cells except the last 2 in each row
             $('table td:not(:nth-last-child(-n+2))').attr('tabindex', '-1');
-        }
-        
+        }     
     });
+   
         // Create the add button
         var addButton = document.createElement("button");
         addButton.setAttribute("type", "button");
@@ -249,7 +267,9 @@ $(document).ready(function () {
         buttonContainer.setAttribute("class", "col-sm-12 d-flex justify-content-between");
         buttonContainer.appendChild(document.getElementById("product-table_paginate"));
         buttonContainer.appendChild(addButton);
-        document.getElementById("product-table_wrapper").appendChild(buttonContainer);});
+        document.getElementById("product-table_wrapper").appendChild(buttonContainer);
+          
+});
 
 </script>
-<script type="module" src="/lib/firebase/products-page.js"></script>
+<script type="module" src="/lib/firebase/products-page.js?newversion"></script>

@@ -46,7 +46,7 @@ async function getData() {
                 data.surname,
                 data.email,
                 data.birthdate,
-                `<img src="${data.photoUrl}" alt="User Photo" class="user-photo"/>`
+                `<img src="${data.photoUrl}" alt="User Photo" class="user-photo" data-name="${data.name} ${data.surname}"/>`
             ]).draw().node();
         });
 

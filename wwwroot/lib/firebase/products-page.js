@@ -21,13 +21,15 @@ const cafeId = "Acv7hYavbdraEyHibjK4";
 // Get a reference to the Firestore document
 const docc = doc(db, "Cafe", cafeId);
 const productsRef = collection(docc, "Product");
+const categoriesRef = collection(docc, "Category");
 const newProductRef = doc(productsRef);
 // Get a reference to the table element
 const table = document.getElementById("product-table");
 
 async function getData() {
     try {
-        const querySnapshot = await getDocs(productsRef);
+        const querySnapshotProducts = await getDocs(productsRef);
+        const querySnapshotCategories = await getDocs(categoriesRef);
 
         // Clear the table before adding new data (except for the headers)
         while (table.rows.length > 1) {
@@ -90,7 +92,7 @@ async function getData() {
         // Clear the table before adding new data (except for the headers)
         $('#product-table').DataTable().clear();
         // Loop through the query snapshot and append the product data to the table
-        querySnapshot.forEach((docc) => {
+        querySnapshotProducts.forEach((docc) => {
             const data = docc.data();
             const row = $('#product-table').DataTable().row.add([
                 data.name,
@@ -109,6 +111,27 @@ async function getData() {
                 openDeleteModal(docc.id);
             });
         });
+
+        // Loop through the categories in the query snapshot
+        querySnapshotCategories.forEach((docc) => {
+            console.log('categrory loop')
+            const data = docc.data();
+
+            // Create a button element for the category
+            const button = $('<button>')
+                .addClass('category-button btn btn-dark')
+                .text(data.name);
+
+            // Add a click event listener to the category button
+            button.click(function() {
+                // Filter the "Category" column to show only the clicked category
+                console.log($(this).text());
+                $('#product-table').DataTable().columns(2).search($(this).text()).draw();
+            });
+            // Add the button to the categories container element
+            $('#categories').append(button);
+        });
+        
 
         // Replace the existing add button with a new one and add an event listener
         const oldAddButton = document.getElementById("add-button");
@@ -291,8 +314,8 @@ async function getData() {
 }
 
 async function productExists(name, category) {
-    const querySnapshot = await getDocs(query(productsRef, where('name', '==', name), where('category', '==', category)));
-    return !querySnapshot.empty;
+    const querySnapshotProducts = await getDocs(query(productsRef, where('name', '==', name), where('category', '==', category)));
+    return !querySnapshotProducts.empty;
 }
 
 // Call the getData function to load the initial table data
