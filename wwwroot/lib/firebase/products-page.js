@@ -78,51 +78,7 @@ async function getData() {
             deleteForm.dataset.docId = productId;
             openModal("delete-modal");
         }
-
-        // Function to delete a product and reload the table data
-        async function deleteProductData(productId) {
-            try {
-                console.log('productId: ', productId);
-                // Show a confirmation message to confirm that the user wants to delete the product
-                const confirmation = await Swal.fire({
-                    icon: 'warning',
-                    title: 'Bu ürünü silmek istediğinize emin misiniz?',
-                    text: 'Bu işlem geri alınamaz.',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Evet, sil'
-                });
-                // If the user confirms the deletion, delete the product document
-                if (confirmation.isConfirmed) {
-                    // Get a reference to the product document to delete
-                    const productDocRef = doc(productsRef, productId);
-                    // Delete the product document
-                    await deleteDoc(productDocRef);
-                    console.log("Product deleted successfully");
-                    // Reload the table data to show the updated product info
-                    await getData();
-                    console.log("Table data reloaded");
-                    // Display a success message to inform the user that the product has been deleted
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Ürün başarıyla silindi',
-                        text: 'Ürün veritabanından başarıyla silindi.',
-                        timer: 1500,
-                        timerProgressBar: true
-                    });
-                }
-            } catch (err) {
-                console.error("Error deleting product:", err);
-                // Show an error message to inform the user that there was a problem deleting the product
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Ürün silinirken hata oluştu',
-                    text: 'Ürünü silerken bir hata oluştu. Lütfen daha sonra tekrar deneyin.'
-                });
-            }
-        }
-
+        
         // Function to open the add modal and reset the form fields
         function openAddModal() {
             console.log("Add button clicked");
@@ -144,7 +100,7 @@ async function getData() {
             ]).draw().node();
 
             const editCell = $('#product-table').DataTable().cell(row, 4).node();
-            createButtonAndAppendToCell('Düzenle', 'btn btn-primary btn-sm', editCell, () => {
+            createButtonAndAppendToCell('Düzenle', 'btn btn-success btn-sm', editCell, () => {
                 openEditModal(docc, data);
             });
 

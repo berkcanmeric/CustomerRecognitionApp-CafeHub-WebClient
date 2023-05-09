@@ -14,5 +14,7 @@
     <ItemGroup>
       <PackageReference Include="datatables.net" Version="1.13.4" />
     </ItemGroup>
-
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
 </Project>
