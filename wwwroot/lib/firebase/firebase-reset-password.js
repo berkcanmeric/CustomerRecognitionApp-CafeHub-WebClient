@@ -9,26 +9,23 @@ import {
 const auth = getAuth();
 
 
-const forgotPasswordLink = document.getElementById('forgot');
+const resetPasswordButton = document.getElementById('resetPasswordButton');
 
-forgotPasswordLink.addEventListener('click', (e) => {
+resetPasswordButton.addEventListener('click', (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     sendPasswordResetEmail(auth, email)
         .then(() => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Password reset email sent',
-                text: 'Please check your email for instructions on how to reset your password.'
-            });
+            document.getElementById("reset-password-error").classList.add("d-none");
+            document.getElementById("reset-password-success").classList.remove("d-none");
+            setTimeout(() => {
+                window.location.href = "/Account/Index";
+            }, 1500);
         })
         .catch((error) => {
             console.log(error.message);
-            Swal.fire({
-                icon: 'error',
-                title: 'Password reset failed',
-                text: 'Please enter a valid email address and try again.'
-            });
+            document.getElementById("reset-password-success").classList.add("d-none");
+            document.getElementById("reset-password-error").classList.remove("d-none");
         });
 });
  

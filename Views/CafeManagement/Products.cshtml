@@ -1,5 +1,7 @@
 ﻿@{
     //TODO: Table cell gaining focus bug
+    //TODO: multiple category buttons
+
     ViewBag.Title = "Products";
 }
 
@@ -62,6 +64,52 @@
         .category-button {
           margin: 5px;
         }
+        /* Add hover effect to Add button */
+        .add-button:hover {
+          background-color: #007bff; /* Change to your desired color */
+          box-shadow: 0 0 5px #007bff; /* Add a box-shadow effect */
+          color: #fff; /* Change the text color to white */
+        }
+        
+        .btn-success {
+          color: #fff;
+          background-color: #28a745;
+          border-color: #28a745;
+        }
+        .btn-success:hover {
+          color: #fff; 
+          box-shadow: 0 0 5px #28a745, 
+                      0 0 25px #28a745,
+                      0 0 50px #28a745,
+                      0 0 100px #28a745;
+        }
+        
+        .btn-danger {
+          color: #fff;  
+          background-color: #dc3545;  
+          border-color: #dc3545; 
+        }
+        .btn-danger:hover {
+          color: #fff;
+          box-shadow: 0 0 5px #dc3545, 
+                      0 0 25px #dc3545,
+                      0 0 50px #dc3545,
+                      0 0 100px #dc3545;        
+        }
+     .btn-primary {
+       color: white; 
+       background-color: #007bff;
+     }
+     
+     .btn-primary:hover {
+       color: white;      
+       background-color: #0069d9; 
+       box-shadow: 
+         0 0 5px #007bff, 
+         0 0 25px #007bff,
+         0 0 50px #007bff,
+         0 0 100px #007bff;     
+     }
     </style>
 </head>
 <body>
@@ -92,10 +140,10 @@
 <div id="edit-modal" class="modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ürünü Düzenle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"></span>
+            <div class="modal-header bg-dark">
+                <h5 class="modal-title text-white">Ürünü Düzenle</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
             <form id="edit-form">
@@ -139,10 +187,10 @@
 <div id="add-modal" class="modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ürün Ekle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"></span>
+            <div class="modal-header bg-dark">
+                <h5 class="modal-title text-white">Ürün Ekle</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
             <form id="add-form">
@@ -181,10 +229,10 @@
 <div id="delete-modal" class="modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ürünü Sil</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"></span>
+            <div class="modal-header bg-dark">
+                <h5 class="modal-title text-white">Ürünü Sil</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
             <div class="modal-body">
@@ -272,4 +320,4 @@ $(document).ready(function () {
 });
 
 </script>
-<script type="module" src="/lib/firebase/products-page.js?newversion"></script>
+<script type="module" src="/lib/firebase/products-page.js"></script>
