@@ -99,13 +99,16 @@
                     <input type="checkbox" class="form-check-input" id="exampleCheck1">
                     <label class="form-check-label" for="exampleCheck1">Beni hatırla</label>
                 </div>
-                <button type="submit" id="loginButton" class="btn btn-primary btn-block mb-3">Giriş Yap</button>
-                <a href="#" class="btn btn-secondary btn-block mb-3">Kayıt Ol</a>
-                <div class="g-signin2 google-btn" id="google-sign-in">
-                    <div class="google-icon-wrapper">
-                        <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
-                    </div>
-                </div>
+               <button type="submit" id="loginButton" class="btn btn-primary btn-block mb-3">Giriş Yap</button>
+               <a href="#" class="btn btn-secondary btn-block mb-3">Kayıt Ol</a>
+               <div class="g-signin2 google-btn" id="google-sign-in">
+                   <div class="google-icon-wrapper">
+                       <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/>
+                   </div>
+               </div>
+               <div class="forgot-password">
+                   <a href="/Account/ResetPassword" id="forgotPasswordLink">Şifrenizi mi unuttunuz?</a>
+               </div>
                 <div class="alert alert-danger d-none my-3" id="login-error" role="alert">
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     <strong>Hata!</strong> <a href="#" class="alert-link">Lütfen e-posta ve şifrenizi kontrol edip tekrar deneyin.</a>
@@ -122,5 +125,5 @@
 </div>
 </body>
 </html>
-<script type="module" src="/lib/firebase/firebase-login.js?newversion"></script>
+<script type="module" src="/lib/firebase/firebase-login.js"></script>
 <script type="module" src="/lib/firebase/firebase-google-auth.js?newversion"></script>

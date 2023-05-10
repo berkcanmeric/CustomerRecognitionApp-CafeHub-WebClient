@@ -32,9 +32,35 @@ async function getAccessToken(code) {
 }
 
 // Initialize the table
-function initTable() {
-    // Call the fetchPlaylists function to load the initial table data
-    fetchPlaylists();
+async function initTable() {
+    try {
+        // Call the fetchPlaylists function to load the initial table data
+        await fetchPlaylists();
+
+        // Get the user's information from the Spotify API
+        const storedAccessToken = getStoredAccessToken();
+        if (!storedAccessToken) {
+            throw new Error('Access token not found');
+        }
+
+        const response = await fetch('https://api.spotify.com/v1/me', {
+            headers: {
+                Authorization: `Bearer ${storedAccessToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user information');
+        }
+
+        const user = await response.json();
+
+        // Update the title to include the user's name
+        document.querySelector('.table-title h1').textContent = `Merhaba ${user.display_name}!`;
+    } catch (error) {
+        console.error('Error in initTable:', error);
+        alert('Error initializing table. Please try again later.');
+    }
 }
 
 // Check if the user is authorized and get the access token if not

@@ -1,5 +1,7 @@
 ﻿@{
     //TODO: Table cell gaining focus bug
+    //TODO: multiple category buttons
+
     ViewBag.Title = "Products";
 }
 
@@ -54,6 +56,60 @@
           width: 400px;
           margin-top: 20px;
         }
+        #categories {
+          display: flex;
+          margin: 5px 5px 5px 0px;
+          justify-content: flex-start;
+        }
+        .category-button {
+          margin: 5px;
+        }
+        /* Add hover effect to Add button */
+        .add-button:hover {
+          background-color: #007bff; /* Change to your desired color */
+          box-shadow: 0 0 5px #007bff; /* Add a box-shadow effect */
+          color: #fff; /* Change the text color to white */
+        }
+        
+        .btn-success {
+          color: #fff;
+          background-color: #28a745;
+          border-color: #28a745;
+        }
+        .btn-success:hover {
+          color: #fff; 
+          box-shadow: 0 0 5px #28a745, 
+                      0 0 25px #28a745,
+                      0 0 50px #28a745,
+                      0 0 100px #28a745;
+        }
+        
+        .btn-danger {
+          color: #fff;  
+          background-color: #dc3545;  
+          border-color: #dc3545; 
+        }
+        .btn-danger:hover {
+          color: #fff;
+          box-shadow: 0 0 5px #dc3545, 
+                      0 0 25px #dc3545,
+                      0 0 50px #dc3545,
+                      0 0 100px #dc3545;        
+        }
+     .btn-primary {
+       color: white; 
+       background-color: #007bff;
+     }
+     
+     .btn-primary:hover {
+       color: white;      
+       background-color: #0069d9; 
+       box-shadow: 
+         0 0 5px #007bff, 
+         0 0 25px #007bff,
+         0 0 50px #007bff,
+         0 0 100px #007bff;     
+     }
     </style>
 </head>
 <body>
@@ -61,6 +117,9 @@
 <div class="container">
     <div class="table-title">
         <h1>Ürünler</h1>
+        <div id="categories" class="category-container">
+            
+        </div>
     </div>
     <table class="table table-hover" id="product-table">
         <thead>
@@ -81,10 +140,10 @@
 <div id="edit-modal" class="modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ürünü Düzenle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"></span>
+            <div class="modal-header bg-dark">
+                <h5 class="modal-title text-white">Ürünü Düzenle</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
             <form id="edit-form">
@@ -128,10 +187,10 @@
 <div id="add-modal" class="modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ürün Ekle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"></span>
+            <div class="modal-header bg-dark">
+                <h5 class="modal-title text-white">Ürün Ekle</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
             <form id="add-form">
@@ -170,10 +229,10 @@
 <div id="delete-modal" class="modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ürünü Sil</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"></span>
+            <div class="modal-header bg-dark">
+                <h5 class="modal-title text-white">Ürünü Sil</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
             <div class="modal-body">
@@ -207,8 +266,15 @@ $(document).ready(function () {
                '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
                '<"row"<"col-sm-12"tr>>' +
                '<"row"<"col-sm-12"<"d-flex justify-content-between"p>>>', // Use a container with justify-content-between class
+        "lengthMenu": [
+                    [5, 10, 20, 50, 100, -1],
+                    [5, 10, 20, 50, 100, 'All']
+                ],
         "language": {
-            "info": "Showing _START_ to _END_ of _TOTAL_ entries"
+             "zeroRecords": "Herhangi bir ürün bulunamadı.",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "searchPlaceholder": "Ürün ara...",
+             "infoFiltered": "(filtered from _MAX_ total Items)"
         },
         "columnDefs": [
             {
@@ -234,9 +300,9 @@ $(document).ready(function () {
 
             // Set tabindex="-1" for all table cells except the last 2 in each row
             $('table td:not(:nth-last-child(-n+2))').attr('tabindex', '-1');
-        }
-        
+        }     
     });
+   
         // Create the add button
         var addButton = document.createElement("button");
         addButton.setAttribute("type", "button");
@@ -249,7 +315,9 @@ $(document).ready(function () {
         buttonContainer.setAttribute("class", "col-sm-12 d-flex justify-content-between");
         buttonContainer.appendChild(document.getElementById("product-table_paginate"));
         buttonContainer.appendChild(addButton);
-        document.getElementById("product-table_wrapper").appendChild(buttonContainer);});
+        document.getElementById("product-table_wrapper").appendChild(buttonContainer);
+          
+});
 
 </script>
 <script type="module" src="/lib/firebase/products-page.js"></script>

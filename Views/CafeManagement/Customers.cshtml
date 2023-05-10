@@ -6,33 +6,56 @@
 <html>
 <head>
     <style>
-        .container {
-            margin-top: 2rem;
-        }
-        .user-photo {
-            width: 50px; /* Change this value to adjust the size of the photos */
-            height: 50px; /* Change this value to adjust the size of the photos */
-            border-radius: 50%; /* Make the photos circular */
-            object-fit: cover; /* Scale the photos to fit the container */
-        }
-        td{
-            vertical-align: middle; 
-        }
-        .pagination .page-item.active .page-link {
-            background-color: #343a40;
-            color: #fff;
-            border-color: #343a40;
-        }  
-        table.dataTable thead th:first-child {
-            border-top-left-radius: 0.375rem;
-            border-bottom-left-radius: 0.375rem;
-        }
-        
-        table.dataTable thead th:last-child {
-            border-top-right-radius: 0.375rem;
-            border-bottom-right-radius: 0.375rem;
-        }
+      .container {
+        margin-top: 2rem;
+      }
+      
+    .user-photo {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      transition: all 0.2s ease-in-out;
+    }
+    
+    .user-photo:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    }
+      
+      td {
+        vertical-align: middle;
+      }
+      
+      .pagination .page-item.active .page-link {
+        background-color: #343a40;
+        color: #fff;
+        border-color: #343a40;
+      }
+      
+      table.dataTable thead th:first-child {
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+      }
+      
+      table.dataTable thead th:last-child {
+        border-top-right-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
+      }
      
+        .modal {
+            margin-top: 2rem;
+          display: none; /* Hidden by default */
+         
+        }
+        .modal-body {       
+          text-align: center;
+        }
+           .modal-content {
+             width: 500px;
+             height: 500px;
+           } 
+      
     </style>
 </head>
 <body>
@@ -55,7 +78,24 @@
         </tbody>
     </table>
 </div>
-
+<!-- Photo Modal -->
+<div id="photo-modal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-white bg-dark">
+                <h5 class="modal-title text-white ">Name and Surname</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+            
+                <div class="modal-body">
+                    <img src="" id="modal-image" />
+                </div>
+            
+        </div>
+    </div>
+</div>
 </body>
 </html>
 <script>
@@ -89,7 +129,25 @@ $(document).ready(function () {
          pagination.wrap($('<div>', {'class': 'pagination'}));
      }
  });
- 
+ const modal = document.getElementById("photo-modal");
+ const modalImage = document.getElementById("modal-image");
+$(document).on("click", ".user-photo", function() {
+  var src = $(this).attr("src"); 
+   modal.style.display = "block";
+   modalImage.src = src;
+    modalImage.style.width="400px";
+    modalImage.style.height="400px";
+    modalImage.style.borderRadius="50%";
+    modalImage.style.objectFit="cover";
+    modalImage.style.transition="all 0.2s ease-in-out";
+   console.log($(this).attr("data-name"));
+   modal.querySelector(".modal-title").textContent = $(this).attr("data-name");
+
+});
+const closeButtonSecondary = modal.querySelector(".btn-close");
+closeButtonSecondary.addEventListener("click", () => {
+  modal.style.display = "none";
+  });
 });
 </script>
 <script type="module" src="/lib/firebase/customer-page.js?newversion"></script>

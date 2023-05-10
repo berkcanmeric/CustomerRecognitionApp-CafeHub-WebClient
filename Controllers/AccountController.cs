@@ -9,4 +9,9 @@ public class AccountController : Controller
     {
         return View();
     }
+    // GET
+    public IActionResult ResetPassword()
+    {
+        return View();
+    }
 }

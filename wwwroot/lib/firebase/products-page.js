@@ -21,13 +21,15 @@ const cafeId = "Acv7hYavbdraEyHibjK4";
 // Get a reference to the Firestore document
 const docc = doc(db, "Cafe", cafeId);
 const productsRef = collection(docc, "Product");
+const categoriesRef = collection(docc, "Category");
 const newProductRef = doc(productsRef);
 // Get a reference to the table element
 const table = document.getElementById("product-table");
 
 async function getData() {
     try {
-        const querySnapshot = await getDocs(productsRef);
+        const querySnapshotProducts = await getDocs(productsRef);
+        const querySnapshotCategories = await getDocs(categoriesRef);
 
         // Clear the table before adding new data (except for the headers)
         while (table.rows.length > 1) {
@@ -54,11 +56,12 @@ async function getData() {
             const closeButtonSecondary = modal.querySelector("#close-btn");
             closeButtonSecondary.removeEventListener("click", closeModal);
             closeButtonSecondary.addEventListener("click", closeModal);
+
             function closeModal() {
                 modal.style.display = "none";
             }
         }
-      
+
         // Function to pre-fill the edit form with product data and open the edit modal
         function openEditModal(docc, data) {
             console.log("Edit button clicked");
@@ -78,7 +81,7 @@ async function getData() {
             deleteForm.dataset.docId = productId;
             openModal("delete-modal");
         }
-        
+
         // Function to open the add modal and reset the form fields
         function openAddModal() {
             console.log("Add button clicked");
@@ -90,7 +93,7 @@ async function getData() {
         // Clear the table before adding new data (except for the headers)
         $('#product-table').DataTable().clear();
         // Loop through the query snapshot and append the product data to the table
-        querySnapshot.forEach((docc) => {
+        querySnapshotProducts.forEach((docc) => {
             const data = docc.data();
             const row = $('#product-table').DataTable().row.add([
                 data.name,
@@ -100,15 +103,38 @@ async function getData() {
             ]).draw().node();
 
             const editCell = $('#product-table').DataTable().cell(row, 4).node();
-            createButtonAndAppendToCell('Düzenle', 'btn btn-success btn-sm', editCell, () => {
-                openEditModal(docc, data);
-            });
+            createButtonAndAppendToCell('<i class="fas fa-edit"></i>',
+                'btn btn-success btn-sm', editCell, () => {
+                    openEditModal(docc, data);
+                });
 
             const deleteCell = $('#product-table').DataTable().cell(row, 5).node();
-            createButtonAndAppendToCell('Sil', 'btn btn-danger btn-sm', deleteCell, () => {
-                openDeleteModal(docc.id);
-            });
+            createButtonAndAppendToCell('<i class="fas fa-trash-alt"></i>',
+                'btn btn-danger btn-sm', deleteCell, () => {
+                    openDeleteModal(docc.id);
+                });
         });
+
+        // Loop through the categories in the query snapshot
+        querySnapshotCategories.forEach((docc) => {
+            console.log('categrory loop')
+            const data = docc.data();
+
+            // Create a button element for the category
+            const button = $('<button>')
+                .addClass('category-button btn btn-dark')
+                .text(data.name);
+
+            // Add a click event listener to the category button
+            button.click(function () {
+                // Filter the "Category" column to show only the clicked category
+                console.log($(this).text());
+                $('#product-table').DataTable().columns(2).search($(this).text()).draw();
+            });
+            // Add the button to the categories container element
+            $('#categories').append(button);
+        });
+
 
         // Replace the existing add button with a new one and add an event listener
         const oldAddButton = document.getElementById("add-button");
@@ -271,6 +297,7 @@ async function getData() {
             const toastInstance = new bootstrap.Toast(toast);
             toastInstance.show();
         }
+
         function replaceForm(oldForm, newForm, formType, submitCallback) {
             // Clone the old form and remove event listeners
             const clonedForm = oldForm.cloneNode(true);
@@ -291,8 +318,8 @@ async function getData() {
 }
 
 async function productExists(name, category) {
-    const querySnapshot = await getDocs(query(productsRef, where('name', '==', name), where('category', '==', category)));
-    return !querySnapshot.empty;
+    const querySnapshotProducts = await getDocs(query(productsRef, where('name', '==', name), where('category', '==', category)));
+    return !querySnapshotProducts.empty;
 }
 
 // Call the getData function to load the initial table data

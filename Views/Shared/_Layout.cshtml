@@ -17,6 +17,12 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap.min.js"></script>
+    
+    <style>
+        .nav-link {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -29,19 +35,19 @@
             <div class="collapse navbar-collapse" id="navbarColor02">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">
-                            Home
+                        <a class="nav-link active" href="/CafeManagement/Index" data-target="home">
+                            Ana Sayfa
                             <span class="visually-hidden">(current)</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/Spotify/Index">Spotify</a>
+                        <a class="nav-link" href="/Spotify/Index" data-target="spotify">Spotify</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pricing</a>
+                        <a class="nav-link" href="#" data-target="pricing">Pricing</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
+                        <a class="nav-link" href="#" data-target="about">About</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
@@ -81,3 +87,16 @@
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+<script type="text/javascript">
+$(document).ready(function() {
+  $('li>a.active').removeClass('active')
+  $('a[href="' + location.pathname + '"]').addClass('active')
+  if (location.pathname.indexOf('Spotify') !== -1 || location.pathname.indexOf('CafeManagement') !== -1) {
+    // Select all the <a> elements with class 'nav-link'
+    var navLinks = $('.nav-link');
+    
+    // Set the display property of each <a> element to 'block'
+    navLinks.css('display', 'block');
+  }
+});
+</script> 
