@@ -55,16 +55,36 @@
              width: 500px;
              height: 500px;
            } 
+              #comments, #customers {
+                display: flex;
+                margin: 5px 5px 5px 0px;
+                justify-content: flex-start;
+                align-items: center;
+              }      
+                        
+               .comments-button {
+                 margin: 5px;
+               }
+               .customers-button {
+                 margin: 5px;
+               }
       
     </style>
 </head>
 <body>
 
+
 <div class="container">
-    <div class="table-title">
-      <h1>Aktif Müşteriler</h1>
+    <div class="table-title" data-table="1">
+        <h1>Aktif Müşteriler</h1>
+     <div id="comments" class="comment-container">
+        <button id="switch1" type="button" data-table="2" class="comments-button btn btn-dark">
+           <i class="fa fa-comment"></i> Yorumlar
+        </button>
+     </div>
+
     </div>
-    <table class="table table-hover" id="customer-table">
+    <table class="table table-hover" id="customer-table" data-table="1">
         <thead>
         <tr class="table-dark">
             <th scope="col">Ad</th>
@@ -77,22 +97,44 @@
         <tbody>
         </tbody>
     </table>
+    
+    
+    <div class="table-title" data-table="2">
+        <h1>Müşteri Yorumları</h1>
+        <div id="customers" class="customer-container">
+           <button id="switch2" type="button" data-table="1" class="customers-button btn btn-dark">
+               <i class="fa fa-user"></i> Aktif Müşteriler
+           </button>
+        </div>
+    </div>
+    <table class="table table-hover" id="rating-table" data-table="2">
+        <thead>
+        <tr class="table-dark">
+            <th scope="col">Kullanıcı</th>
+            <th scope="col">Yorum</th>
+            <th scope="col">Tarih</th>
+            <th scope="col">Puan</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 </div>
 <!-- Photo Modal -->
 <div id="photo-modal" class="modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header text-white bg-dark">
-                <h5 class="modal-title text-white ">Name and Surname</h5>
+                <h5 class="modal-title text-white ">Kullanıcı</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true"></span>
                 </button>
             </div>
-            
-                <div class="modal-body">
-                    <img src="" id="modal-image" />
-                </div>
-            
+
+            <div class="modal-body">
+                <img src="" id="modal-image"/>
+            </div>
+
         </div>
     </div>
 </div>
@@ -101,34 +143,38 @@
 <script>
 $(document).ready(function () {
     $.noConflict();
- var table = $('#customer-table').DataTable({
-     "paging": true,
-     "pageLength": 5,
-     "pagingType": "simple_numbers",
-     "dom": '<"row"<"col-sm-12 text-center"<"h3 mb-0">>>' +
-            '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-            '<"row"<"col-sm-12"tr>>' +
-            '<"row"<"col-sm-12"<"d-flex justify-content-between"p>>>', // Use a container with justify-content-between class
-     "language": {
-         "info": "Showing _START_ to _END_ of _TOTAL_ entries"
-     },
-     "drawCallback": function() {
-         // Get the pagination links
-         var pagination = $(this).closest('.dataTables_wrapper').find('.pagination');
- 
-         // Update the class of the li elements
-         pagination.find('li').removeClass('paginate_button').addClass('page-item');
- 
-         // Add the Bootstrap classes to the page links
-         pagination.find('a').addClass('page-link');
- 
-         // Add the "active" class to the current page link
-         pagination.find('.active').addClass('disabled');
- 
-         // Wrap the pagination links in a div with the pagination class
-         pagination.wrap($('<div>', {'class': 'pagination'}));
-     }
- });
+    initDataTable('#customer-table');
+    initDataTable('#rating-table');
+  function initDataTable(tableId) {
+     $(tableId).DataTable({
+        "paging": true,
+        "pageLength": 5,  
+        "pagingType": "simple_numbers", 
+        "dom": '<"row"<"col-sm-12 text-center"<"h3 mb-0">>>' +
+               '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+               '<"row"<"col-sm-12"tr>>' +
+               '<"row"<"col-sm-12"<"d-flex justify-content-between"p>>>',
+        "language": {
+           "info": "Showing _START_ to _END_ of _TOTAL_ entries"
+        },
+        "drawCallback": function() {
+                 // Get the pagination links
+                 var pagination = $(this).closest('.dataTables_wrapper').find('.pagination');
+         
+                 // Update the class of the li elements
+                 pagination.find('li').removeClass('paginate_button').addClass('page-item');
+         
+                 // Add the Bootstrap classes to the page links
+                 pagination.find('a').addClass('page-link');
+         
+                 // Add the "active" class to the current page link
+                 pagination.find('.active').addClass('disabled');
+         
+                 // Wrap the pagination links in a div with the pagination class
+                 pagination.wrap($('<div>', {'class': 'pagination'}));
+             }
+     });
+  }
  const modal = document.getElementById("photo-modal");
  const modalImage = document.getElementById("modal-image");
 $(document).on("click", ".user-photo", function() {
@@ -148,6 +194,33 @@ const closeButtonSecondary = modal.querySelector(".btn-close");
 closeButtonSecondary.addEventListener("click", () => {
   modal.style.display = "none";
   });
+var tables = $("table");
+var tableTitles = $(".table-title");
+
+   tables.each(function() {
+        $(this).parent().parent().parent().hide();
+    });
+   
+   tableTitles.hide().first().show();
+    tables.first().parent().parent().parent().show();
+  // Hides all the tables except the first
+  console.log("Initial table visibility set up.");
 });
+var tables = $("table");
+var tableTitles = $(".table-title");
+$("#switch1").on("click", function() {
+    toggleTables(0, 1); // Show second table, hide first
+});
+
+$("#switch2").on("click", function() {
+    toggleTables(1, 0);  // Show first table, hide second 
+});
+function toggleTables(fromIndex, toIndex) {
+  tables.eq(fromIndex).parent().parent().parent().hide();
+  tableTitles.eq(fromIndex).hide();  
+  
+  tables.eq(toIndex).parent().parent().parent().show();
+  tableTitles.eq(toIndex).show();
+}
 </script>
 <script type="module" src="/lib/firebase/customer-page.js?newversion"></script>
