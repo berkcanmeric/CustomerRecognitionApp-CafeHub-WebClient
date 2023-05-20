@@ -73,7 +73,6 @@ async function getData() {
                 `<img src="${data.photoUrl}" alt="User Photo" class="user-photo" data-name="${data.name} ${data.surname}"/>`
             ]).draw().node();
         });
-        console.log(users);
 
         // Loop through the rating documents and add a row to the table for each one
         const ratingsQuerySnapshot = await getDocs(ratingsQueryRef);

@@ -1,0 +1,38 @@
+.user-photo {
+  width: 100px;
+  border-radius: 50%;
+  margin-right: 20px;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.label {
+  font-weight: bold;
+}
+
+/* Added hover effect for table rows */
+#product-table tbody tr:hover {
+  background-color: #e7f0ff;
+  color: rgba(0,0,0,0.8);
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+#product-table tbody tr.selected {
+  background-color: #007bff33;
+  animation: selected 0.3s ease;
+}
+
+@keyframes selected {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+#product-table tbody tr:hover input[type="checkbox"] {
+  transform: scale(1.2);
+}
+/* Added selected row styling for checkbox */
+#product-table tbody tr.selected input[type="checkbox"] {
+  transform: scale(1.2);
+}
