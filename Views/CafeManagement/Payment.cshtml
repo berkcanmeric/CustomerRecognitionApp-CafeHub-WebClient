@@ -3,12 +3,13 @@
 <head>
     <link href="~/css/products-page.css" rel="stylesheet"/>
     <link href="~/css/payment-page.css" rel="stylesheet"/>
+   
 </head>
 <body>
 
 <div class="container">
     <div class="table-title">
-        <h1>Ürünler</h1>
+        <h1>Siparişler</h1>
         <div id="categories" class="category-container">
 
         </div>
@@ -23,6 +24,7 @@
             <th scope="col">Fiyat</th>
             <th scope="col">Kategori</th>
             <th scope="col">Resim</th>
+            <th scope="col" style="display: none;">ID</th> <!-- Hide the ID column using CSS -->
         </tr>
         </thead>
 
@@ -33,8 +35,9 @@
 
 
 <input type="hidden" id="userId" value="@Model"/>
-<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
-    Display User Information
+<!-- Button to toggle off-canvas -->
+<button class="offcanvas-toggle-button" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+    <i class="fas fa-user"></i>
 </button>
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
     <div class="offcanvas-header">
@@ -46,19 +49,28 @@
             <div id="userPhoto"></div>
 
             <div class="user-details">
-                <p>
-                    <span class="label">İsim:</span> <span id="userName"></span>
-                </p>
-                <p>
-                    <span class="label">Soyisim:</span> <span id="userSurname"></span>
-                </p>
-                <p>
-                    <span class="label">E-posta:</span> <span id="userEmail"></span>
-                </p>
-                <p>
-                    <span class="label">Doğum Tarihi:</span> <span id="userBirthdate"></span>
-                </p>
+                <div class="user-info-container">
+                    <!-- Added div wrapper -->
+
+                    <p>
+                        <span class="label">İsim:</span> <span id="userName"></span>
+                    </p>
+                    <p>
+                        <span class="label">Soyisim:</span> <span id="userSurname"></span>
+                    </p>
+                    <p>
+                        <span class="label">E-posta:</span> <span id="userEmail"></span>
+                    </p>
+                    <p>
+                        <span class="label">Doğum Tarihi:</span> <span id="userBirthdate"></span>
+                    </p>
+                </div>
             </div>
+        </div>
+        <div id="selected-products-container"></div>
+        <!-- Container to display selected products -->
+        <div class="checkout-button-container">
+            <button id="checkout-button" class="btn btn-primary">Checkout</button>
         </div>
     </div>
 </div>
@@ -78,90 +90,125 @@ $(document).ready(function () {
                '<"row"<"col-sm-12"<"d-flex justify-content-between"p>>>', // Use a container with justify-content-between class
         "lengthMenu": [
             [5, 10, 20, 50, 100, -1],
-            [5, 10, 20, 50, 100, 'All']
-        ],
-        "language": {
-             "zeroRecords": "Herhangi bir ürün bulunamadı.",
-            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-            "searchPlaceholder": "Ürün ara...",
-             "infoFiltered": "(filtered from _MAX_ total Items)"
-        },
-        "columnDefs": [
-            {
-                "defaultContent": "",
-                "targets": "_all"
-            }
-        ],
-        "drawCallback": function() {
-            // Get the pagination links
-            var pagination = $(this).closest('.dataTables_wrapper').find('.pagination');
-    
-            // Update the class of the li elements
-            pagination.find('li').removeClass('paginate_button').addClass('page-item');
-    
-            // Add the Bootstrap classes to the page links
-            pagination.find('a').addClass('page-link');
-    
-            // Add the "active" class to the current page link
-            pagination.find('.active').addClass('disabled');
-    
-            // Wrap the pagination links in a div with the pagination class
-            pagination.wrap($('<div>', {'class': 'pagination'}));
-           
-        }     
-    }); 
-    
-    // Create the selected products count element
-    var selectedProducts = $('<p>')
-        .attr('id', 'selected-products-count')
-        .addClass('lead')
-        .text(table.rows('.selected').data().length + ' product(s) selected');
+            [5, 10,20, 50, 100, 'Tümü']
+                   ],
+                   "language": {
+                   "zeroRecords": "Herhangi bir ürün bulunamadı.",
+                   "info": "TOTAL kayıttan START ile END arasındaki kayıtlar gösteriliyor",
+                   "searchPlaceholder": "Ürün ara...",
+                   "infoFiltered": "(MAX toplam kayıttan filtrelendi)"
+                   },
+                   "columnDefs": [
+                   {
+                   "defaultContent": "",
+                   "targets": "_all"
+                   }
+                   ],
+                   "drawCallback": function() {
+                   // Get the pagination links
+                   var pagination = $(this).closest('.dataTables_wrapper').find('.pagination');
+                           // Update the class of the li elements
+                           pagination.find('li').removeClass('paginate_button').addClass('page-item');
+                   
+                           // Add the Bootstrap classes to the page links
+                           pagination.find('a').addClass('page-link');
+                   
+                           // Add the "active" class to the current page link
+                           pagination.find('.active').addClass('disabled');
+                   
+                           // Wrap the pagination links in a div with the pagination class
+                           pagination.wrap($('<div>', {'class': 'pagination'}));
+                          
+                       }     
+                   }); 
+                   
+                   // Create the selected products count element
+                   var selectedProducts = $('<p>')
+                       .attr('id', 'selected-products-count')
+                       .addClass('lead')
+                       .text(table.rows('.selected').data().length + ' ürün seçildi');
+                   
+                   // Append the selected products count to the DataTables table
+                   var buttonContainer = $('<div>')
+                       .addClass('col-sm-12 d-flex justify-content-between')
+                       .append($('#product-table_paginate'))
+                       .append(selectedProducts);
+                   $('#product-table_wrapper').append(buttonContainer);
+                   
+                   // Add event listener to the "check-all" checkbox
+                   $('#check-all').on('change', function() {
+                       var isChecked = $(this).prop('checked');
+                       // Set the checked state of all checkboxes in the table
+                       $('#product-table tbody tr').each(function() {
+                           var checkbox = $(this).find('input[type="checkbox"]');
+                           checkbox.prop('checked', isChecked);
+                           $(this).toggleClass('selected', isChecked);
+                       });
+                       updateSelectedProductsCount();
+                   });
+                  
+                   
+                   
+                function updateSelectedProducts(selectedProducts) {
+  const selectedProductsContainer = document.getElementById("selected-products-container");
+  selectedProductsContainer.innerHTML = ""; // Clear the container before adding new products
 
-    // Append the selected products count to the DataTables table
-    var buttonContainer = $('<div>')
-        .addClass('col-sm-12 d-flex justify-content-between')
-        .append($('#product-table_paginate'))
-        .append(selectedProducts);
-    $('#product-table_wrapper').append(buttonContainer);
+  selectedProducts.forEach((product) => {
+    const productElement = document.createElement("div");
+    productElement.classList.add("selected-product");
 
-    // Add event listener to the "check-all" checkbox
-    $('#check-all').on('change', function() {
-        var isChecked = $(this).prop('checked');
-        // Set the checked state of all checkboxes in the table
-        $('#product-table tbody tr').each(function() {
-            var checkbox = $(this).find('input[type="checkbox"]');
-            checkbox.prop('checked', isChecked);
-            $(this).toggleClass('selected', isChecked);
-        });
-        updateSelectedProductsCount();
-    });
-    
-    // Update selected products count when row is clicked or checkbox is changed
-    function updateSelectedProductsCount() {
-        var selectedRowCount = table.rows('.selected').data().length;
-        $('#selected-products-count').text(selectedRowCount + ' product(s) selected');
-    }
+       const productImageHTML = product[4];  // Product image HTML is at index 4
+        productElement.innerHTML = productImageHTML; 
+        
+    const productDetails = document.createElement("div");
+    productDetails.classList.add("product-details");
 
-        
-        // Toggle selected state and checkbox when row is clicked
-        $('#product-table tbody').on('click', 'tr', function() {
-            var checkbox = $(this).find('input[type="checkbox"]');
-            checkbox.prop('checked', !checkbox.prop('checked'));
-            $(this).toggleClass('selected');
-            updateSelectedProductsCount();
-        });
-        
-        // Toggle selected state and checkbox when checkbox is clicked
-        $('#product-table tbody').on('click', 'tr input[type="checkbox"]', function(event) {
-            event.stopPropagation();
-            $(this).closest('tr').toggleClass('selected');
-            updateSelectedProductsCount();
-        });
-        
-        // Update selected products count when table is redrawn
-        $('#product-table').on('draw.dt', function() {
-            updateSelectedProductsCount();
-        });
+    const productName = document.createElement("span");
+    productName.textContent = product[1]; // Product name is at index 1
+    productName.classList.add("product-name");
+    productDetails.appendChild(productName);
+
+    const productPrice = document.createElement("span");
+    productPrice.textContent = " " + product[2] + " TL"; // Product price is at index 2
+    productPrice.classList.add("product-price");
+    productDetails.appendChild(productPrice);
+
+    productElement.appendChild(productDetails);
+    selectedProductsContainer.appendChild(productElement);
+  });
+}
+                   
+                   // Update selected products count when row is clicked or checkbox is changed
+               function updateSelectedProductsCount() {
+                 const selectedRowCount = table.rows('.selected').data().length;
+                 $('#selected-products-count').text(selectedRowCount + ' ürün seçildi');
+               
+                 const selectedProducts = table.rows('.selected').data().toArray(); // Get the selected products as an array
+                 updateSelectedProducts(selectedProducts);
+               }
+                   
+                       
+                       // Toggle selected state and checkbox when row is clicked
+                       $('#product-table tbody').on('click', 'tr', function() {
+                           var checkbox = $(this).find('input[type="checkbox"]');
+                           checkbox.prop('checked', !checkbox.prop('checked'));
+                           $(this).toggleClass('selected');
+                           updateSelectedProductsCount();
+                       });
+                       
+                       // Toggle selected state and checkbox when checkbox is clicked
+                       $('#product-table tbody').on('click', 'tr input[type="checkbox"]', function(event) {
+                           event.stopPropagation();
+                           $(this).closest('tr').toggleClass('selected');
+                           updateSelectedProductsCount();
+                       });
+                       
+                       // Update selected products count when table is redrawn
+                       $('#product-table').on('draw.dt', function() {
+                           updateSelectedProductsCount();
+                       });
 });
+
 </script>
+
 <script type="module" src="/lib/firebase/payment-page.js?newversion"></script>
