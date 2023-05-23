@@ -58,9 +58,10 @@ async function getUserData() {
                     data.name,
                     data.price,
                     data.category,
-                    `<img src="${data.imageUrl}" alt="Product Image" class="product-image"/>`,
-                    data.id, // Add the 'data-id' attribute as a hidden column
-                ]).draw().node();
+                    `<img src="${data.imageUrl}" alt="Product Image" class="product-image"/>`
+                ]).draw().node()  // Add data-id attribute
+                row.removeChild(row.lastChild); // Remove the extra empty TD
+                row.setAttribute('data-id', data.id);
             });
             // Loop through the categories in the query snapshot
             querySnapshotCategories.forEach((cafeDocRef) => {
@@ -113,12 +114,12 @@ async function getUserData() {
 }
 
 $('#checkout-button').on('click', async function () {
-    debugger;
     // Get the selected product rows
     const table = $('#product-table').DataTable(); // Initialize the table with DataTables
 
     // Get the selected product rows
     const selectedRows = table.rows('.selected');
+    const id = $(selectedRows.nodes()).data('id'); // Get id from data attribute
     if (selectedRows.count() === 0) {
         showToast('No products selected for checkout.', 'error');
         return;
@@ -130,7 +131,7 @@ $('#checkout-button').on('click', async function () {
         const product = selectedRowsData[i];
         if (typeof product !== 'undefined') { // Check if the product variable is defined
             selectedProducts.push({
-                id: product[5], // Use the value of the 'data-id' attribute as the product ID
+                id: id, // Use the value of the 'data-id' attribute as the product ID
                 name: product[1], // Assuming the first column contains the product name
                 price: product[2], // Assuming the second column contains the product price
                 category: product[3], // Assuming the third column contains the product category
@@ -252,22 +253,23 @@ async function addCouponToUser(userId, cafeId) {
             userId: userId,
             cafeId: cafeId,
             couponCode: "",
-            couponCount: 1
+            couponCount: 1,
+            couponAvailable: false
         });
     } else {
         // Increment the coupon count of the existing document
         querySnapshot.forEach((doc) => {
             const currentCouponCount = doc.data().couponCount;
 
-            if (currentCouponCount < 5) {
+            if (currentCouponCount >= 4 ) {
                 updateDoc(doc.ref, {
-                    couponCount: currentCouponCount + 1,
-                    couponCode: couponCode
+                    couponCount: 0,
+                    couponCode: couponCode,
+                    couponAvailable: true
                 });
             } else {
                 updateDoc(doc.ref, {
                     couponCount: currentCouponCount + 1,
-                    couponCode: ""
                 });
             }
         });

@@ -14,43 +14,61 @@ import {
     limit,
     startAfter,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    setPersistence,
+    browserSessionPersistence,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 
+const auth = getAuth();
 
 // Initialize Firestore
 const db = getFirestore(app);
 
-const cafeId = "Acv7hYavbdraEyHibjK4";
 
-// Get a reference to the Firestore document
-const cafeDocRef = doc(db, "Cafe", cafeId);
 
-const activeUsersRef = collection(cafeDocRef, "ActiveUserList");
-// Get a reference to the Firestore collection "Rating"
-const ratingsRef = collection(db, "Rating");
-
-// Get all documents in ActiveUserList 
-const activeUserDocs = await getDocs(activeUsersRef);
-
-// Get an array of all userids from those documents
-const userIds = activeUserDocs.docs.map(doc => doc.data().userId);
-
-const usersQueryRef = query(
-    collection(db, "User"),
-    where("id", "in", userIds)
-);
-const ratingsQueryRef = query(ratingsRef, orderBy("ratingDate"));
-
-const usersQuerySnapshot = await getDocs(usersQueryRef);
-const ratingsQuerySnapshot = await getDocs(ratingsQueryRef);
-
-async function initTable() {
-    // Call the getData function to load the initial table data
-    getData();
-}
+onAuthStateChanged(auth, user => {
+    if (user) {
+        getData();
+    }
+})
 
 
 async function getData() {
     try {
+        const currentCafe = query(
+            collection(db, "Cafe"),
+            where("userUID", "==", auth.currentUser.uid)
+        );
+
+        // Run the query
+        const querySnapshot = await getDocs(currentCafe);
+        
+        const cafeId = querySnapshot.docs[0].id;
+
+        // Get a reference to the Firestore document
+        const cafeDocRef = doc(db, "Cafe", cafeId);
+
+        const activeUsersRef = collection(cafeDocRef, "ActiveUserList");
+        // Get a reference to the Firestore collection "Rating"
+        const ratingsRef = collection(db, "Rating");
+
+         // Get all documents in ActiveUserList 
+        const activeUserDocs = await getDocs(activeUsersRef);
+
+        // Get an array of all userids from those documents
+        const userIds = activeUserDocs.docs.map(doc => doc.data().userId);
+
+        const usersQueryRef = query(
+            collection(db, "User"),
+            where("id", "in", userIds)
+        );
+        const ratingsQueryRef = query(ratingsRef, orderBy("ratingDate"));
+        
+        
+        
         // Clear the table before adding new data (except for the headers)
         $('#customer-table').DataTable().clear();
         $('#rating-table').DataTable().clear();
@@ -103,7 +121,3 @@ async function getData() {
         console.error("Error getting documents:", err);
     }
 }
-
-
-// Call the initTable function to initialize the table
-initTable();
