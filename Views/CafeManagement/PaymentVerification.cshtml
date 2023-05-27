@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "Ödeme Doğrulama";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="~/css/payment-verification.css"/>
+    <script type="module" src="/lib/firebase/payment-verification-page.js?newversion"></script>
+</head>
+<body>
+<div class="container">
+    <div class="verification-page">
+        <!-- Loading animation element -->
+        <div id="loading-spinner" class="loading-animation">
+            <div class="spinner"></div>
+        </div>
+
+        <form class="verification-form" id="verification-form">
+
+            <h1>Ödeme Doğrulama</h1>
+            <p>Lütfen e-posta veya telefon numaranıza gönderilen doğrulama kodunu girin:</p>
+            <div class="code-input">
+                <label for="code1">Kod:</label>
+
+                <input id="code1" maxlength="1">
+                <input id="code2" maxlength="1">
+                <input id="code3" maxlength="1">
+                <input id="code4" maxlength="1">
+            </div>
+            <button type="submit" class="submit-btn" >Gönder</button>
+            <div id="error-msg" class="error"></div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

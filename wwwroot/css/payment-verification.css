@@ -1,0 +1,87 @@
+/* CSS styles for the loading animation */
+.loading-animation {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 9999;
+}
+.loading-animation .spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Existing CSS styles for the form */
+.verification-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+.verification-form {
+  width: 400px;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 0.5rem;
+}
+.verification-form h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+.verification-form p {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.verification-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+.verification-form .code-input {
+  display: flex;
+  justify-content: space-between;
+}
+.verification-form .code-input input {
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+  font-size: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+}
+.verification-form .submit-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #2299ff;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  transition: background-color 0.2s ease-in-out;
+}
+.verification-form .submit-btn:hover {
+  background-color: #007bff;
+}
+.verification-form .error {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
