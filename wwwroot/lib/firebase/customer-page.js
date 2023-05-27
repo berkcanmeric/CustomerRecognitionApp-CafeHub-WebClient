@@ -42,7 +42,8 @@ async function getData() {
             collection(db, "Cafe"),
             where("userUID", "==", auth.currentUser.uid)
         );
-
+    console.log(currentCafe);
+    console.log(auth.currentUser.uid);
         // Run the query
         const querySnapshot = await getDocs(currentCafe);
         
@@ -65,7 +66,10 @@ async function getData() {
             collection(db, "User"),
             where("id", "in", userIds)
         );
-        const ratingsQueryRef = query(ratingsRef, orderBy("ratingDate"));
+        const ratingsQueryRef = query(
+            ratingsRef,
+            where("cafeId", "==", cafeId)
+        );
         
         
         

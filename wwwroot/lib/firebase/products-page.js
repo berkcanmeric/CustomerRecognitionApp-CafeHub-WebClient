@@ -13,21 +13,49 @@ import {
     query,
     where,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    setPersistence,
+    browserSessionPersistence,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 
+const auth = getAuth();
+
+onAuthStateChanged(auth, user => {
+    if (user) {
+        getData();
+    }
+})
 // Initialize Firestore
 const db = getFirestore(app);
 
-const cafeId = "Acv7hYavbdraEyHibjK4";
-// Get a reference to the Firestore document
-const docc = doc(db, "Cafe", cafeId);
-const productsRef = collection(docc, "Product");
-const categoriesRef = collection(docc, "Category");
-const newProductRef = doc(productsRef);
+
 // Get a reference to the table element
 const table = document.getElementById("product-table");
 
 async function getData() {
     try {
+
+        const currentCafe = query(
+            collection(db, "Cafe"),
+            where("userUID", "==", auth.currentUser.uid)
+        );
+        console.log(auth.currentUser.uid+" "+"currentCafe")
+        console.log(currentCafe +" "+"currentCafe")
+        // Run the query
+        const querySnapshot = await getDocs(currentCafe);
+
+        const cafeId = querySnapshot.docs[0].id;
+
+        // Get a reference to the Firestore document
+        const cafeDocRef = doc(db, "Cafe", cafeId);
+       
+        const productsRef = collection(cafeDocRef, "Product");
+        const categoriesRef = collection(cafeDocRef, "Category");
+        const newProductRef = doc(productsRef);
+        
         const querySnapshotProducts = await getDocs(productsRef);
         const querySnapshotCategories = await getDocs(categoriesRef);
 
@@ -63,7 +91,7 @@ async function getData() {
         }
 
         // Function to pre-fill the edit form with product data and open the edit modal
-        function openEditModal(docc, data) {
+        function openEditModal(cafeDocRef, data) {
             console.log("Edit button clicked");
             const editForm = document.getElementById("edit-form");
             editForm.elements.name.value = data.name;
@@ -71,7 +99,7 @@ async function getData() {
             editForm.elements.category.value = data.category;
             // editForm.elements.bestSelling.value = data.bestSelling.checked;
             editForm.elements.imageUrl.value = data.imageUrl;
-            editForm.dataset.docId = docc.id;
+            editForm.dataset.docId = cafeDocRef.id;
             openModal("edit-modal");
         }
 
@@ -93,8 +121,8 @@ async function getData() {
         // Clear the table before adding new data (except for the headers)
         $('#product-table').DataTable().clear();
         // Loop through the query snapshot and append the product data to the table
-        querySnapshotProducts.forEach((docc) => {
-            const data = docc.data();
+        querySnapshotProducts.forEach((cafeDocRef) => {
+            const data = cafeDocRef.data();
             const row = $('#product-table').DataTable().row.add([
                 data.name,
                 data.price,
@@ -105,20 +133,20 @@ async function getData() {
             const editCell = $('#product-table').DataTable().cell(row, 4).node();
             createButtonAndAppendToCell('<i class="fas fa-edit"></i>',
                 'btn btn-success btn-sm', editCell, () => {
-                    openEditModal(docc, data);
+                    openEditModal(cafeDocRef, data);
                 });
 
             const deleteCell = $('#product-table').DataTable().cell(row, 5).node();
             createButtonAndAppendToCell('<i class="fas fa-trash-alt"></i>',
                 'btn btn-danger btn-sm', deleteCell, () => {
-                    openDeleteModal(docc.id);
+                    openDeleteModal(cafeDocRef.id);
                 });
         });
 
         // Loop through the categories in the query snapshot
-        querySnapshotCategories.forEach((docc) => {
+        querySnapshotCategories.forEach((cafeDocRef) => {
             console.log('categrory loop')
-            const data = docc.data();
+            const data = cafeDocRef.data();
 
             // Create a button element for the category
             const button = $('<button>')
@@ -175,7 +203,10 @@ async function getData() {
             "delete",
             submitDeleteForm
         );
-
+        async function productExists(name, category) {
+            const querySnapshotProducts = await getDocs(query(productsRef, where('name', '==', name), where('category', '==', category)));
+            return !querySnapshotProducts.empty;
+        }
         async function submitEditForm() {
             event.preventDefault();
             console.log("Edit form submitted");
@@ -317,10 +348,4 @@ async function getData() {
     $('#product-table').DataTable().draw();
 }
 
-async function productExists(name, category) {
-    const querySnapshotProducts = await getDocs(query(productsRef, where('name', '==', name), where('category', '==', category)));
-    return !querySnapshotProducts.empty;
-}
 
-// Call the getData function to load the initial table data
-getData();

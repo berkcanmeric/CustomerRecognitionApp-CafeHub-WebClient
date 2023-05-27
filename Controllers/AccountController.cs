@@ -14,4 +14,9 @@ public class AccountController : Controller
     {
         return View();
     }
+   // GET
+    public IActionResult Register()
+    {
+        return View();
+    }
 }

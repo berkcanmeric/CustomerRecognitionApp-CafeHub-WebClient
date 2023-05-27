@@ -27,6 +27,12 @@ const newProductRef = doc(productsRef);
 // Get a reference to the table element
 const table = document.getElementById("product-table");
 
+onAuthStateChanged(auth, user => {
+    if (user) {
+        getData();
+    }
+})
+
 async function getUserData() {
     try {
         if (userIds.includes(userId)) {
@@ -62,6 +68,8 @@ async function getUserData() {
                 ]).draw().node()  // Add data-id attribute
                 row.removeChild(row.lastChild); // Remove the extra empty TD
                 row.setAttribute('data-id', data.id);
+                row.setAttribute('data-isBestSelling', data.isBestSelling);
+                row.setAttribute('data-imageUrl', data.imageUrl);
             });
             // Loop through the categories in the query snapshot
             querySnapshotCategories.forEach((cafeDocRef) => {
@@ -119,7 +127,7 @@ $('#checkout-button').on('click', async function () {
 
     // Get the selected product rows
     const selectedRows = table.rows('.selected');
-    const id = $(selectedRows.nodes()).data('id'); // Get id from data attribute
+    // const id = $(selectedRows.nodes()).data('id'); // Get id from data attribute
     if (selectedRows.count() === 0) {
         showToast('No products selected for checkout.', 'error');
         return;
@@ -129,39 +137,48 @@ $('#checkout-button').on('click', async function () {
     const selectedRowsData = selectedRows.data(); // Get the data for the selected rows
     for (let i = 0; i < selectedRowsData.length; i++) {
         const product = selectedRowsData[i];
+        const id = $(selectedRows.nodes()[i]).data('id'); // Get id from data attribute for each row
+        const isBestSelling = $(selectedRows.nodes()[i]).data('isbestselling'); // Get id from data attribute for each row
+        const imageUrl = $(selectedRows.nodes()[i]).data('imageurl'); // Get id from data attribute for each row
         if (typeof product !== 'undefined') { // Check if the product variable is defined
             selectedProducts.push({
                 id: id, // Use the value of the 'data-id' attribute as the product ID
                 name: product[1], // Assuming the first column contains the product name
                 price: product[2], // Assuming the second column contains the product price
-                category: product[3], // Assuming the third column contains the product category
+                category: product[3], // Assuming the third column contains theproduct category
+                isBestSelling: isBestSelling,
+                imageUrl:imageUrl,
             });
         }
     }
-    
+
     // Create the order object
     const order = {
         userId: userId,
         cafeId: cafeId,
-        products: selectedProducts,
         cost: calculateTotalCost(selectedProducts), // Calculate the total cost
-        isRated:false,
+        isRated: false,
         SpotifyPermissions: {
             totalTracks: 1,
             until: new Date(Date.now() + 3600000),
         },
         time: new Date(), // Current time
     };
-    
+
     try {
         // Add the order to the Firestore collection
-        await addDoc(collection(db, 'Order'), order); // Use the top-level "Order" collection
-        
+        const orderRef = await addDoc(collection(db, 'Order'), order); // Use the top-level "Order" collection
+
+        // Add the selected products as a subcollection of the order
+        for (let i = 0; i < selectedProducts.length; i++) {
+            await addDoc(collection(orderRef, 'Product'), selectedProducts[i]);
+        }
+
         // Clear the selected products and update the off-canvas view
         const selectedRowsNodes = selectedRows.nodes(); // Get the DOM nodes of the selected rows
         $(selectedRowsNodes).removeClass('selected'); // Remove the 'selected' class from the selected rows
-        var checkbox=$(selectedRowsNodes).find('input[type="checkbox"]'); // Remove the checkmarks from the selected rows
-        checkbox.prop('checked', !checkbox.prop('checked'));      
+        var checkbox = $(selectedRowsNodes).find('input[type="checkbox"]'); // Remove the checkmarks from the selected rows
+        checkbox.prop('checked', !checkbox.prop('checked'));
         updateSelectedProductsCount();
         await addCouponToUser(userId, cafeId);
         showToast('Order placed successfully.', 'success');
@@ -170,7 +187,6 @@ $('#checkout-button').on('click', async function () {
         console.error('Error placing order:', error);
     }
 });
-
 function showToast(message, type = 'error') {
     const toast = document.createElement('div');
     toast.className = `toast bg-${type}`;
