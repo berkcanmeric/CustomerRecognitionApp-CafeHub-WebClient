@@ -11,6 +11,8 @@ import {
     setDoc,
     addDoc,
     query,
+    orderBy,
+    limit,
     where,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 import {
@@ -22,6 +24,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 
 const auth = getAuth();
+let categoriesLoaded = false;
 
 onAuthStateChanged(auth, user => {
     if (user) {
@@ -42,8 +45,8 @@ async function getData() {
             collection(db, "Cafe"),
             where("userUID", "==", auth.currentUser.uid)
         );
-        console.log(auth.currentUser.uid+" "+"currentCafe")
-        console.log(currentCafe +" "+"currentCafe")
+        console.log(auth.currentUser.uid + " " + "currentCafe")
+        console.log(currentCafe + " " + "currentCafe")
         // Run the query
         const querySnapshot = await getDocs(currentCafe);
 
@@ -51,10 +54,11 @@ async function getData() {
 
         // Get a reference to the Firestore document
         const cafeDocRef = doc(db, "Cafe", cafeId);
-       
+
         const productsRef = collection(cafeDocRef, "Product");
         const categoriesRef = collection(cafeDocRef, "Category");
         const newProductRef = doc(productsRef);
+
         
         const querySnapshotProducts = await getDocs(productsRef);
         const querySnapshotCategories = await getDocs(categoriesRef);
@@ -89,6 +93,7 @@ async function getData() {
                 modal.style.display = "none";
             }
         }
+        
 
         // Function to pre-fill the edit form with product data and open the edit modal
         function openEditModal(cafeDocRef, data) {
@@ -142,27 +147,30 @@ async function getData() {
                     openDeleteModal(cafeDocRef.id);
                 });
         });
+        if (!categoriesLoaded) {
+            // Loop through the categories in the query snapshot
+            querySnapshotCategories.forEach((cafeDocRef) => {
+                console.log('categrory loop')
+                const data = cafeDocRef.data();
 
-        // Loop through the categories in the query snapshot
-        querySnapshotCategories.forEach((cafeDocRef) => {
-            console.log('categrory loop')
-            const data = cafeDocRef.data();
+                // Create a button element for the category
+                const button = $('<button>')
+                    .addClass('category-button btn btn-dark')
+                    .text(data.name);
 
-            // Create a button element for the category
-            const button = $('<button>')
-                .addClass('category-button btn btn-dark')
-                .text(data.name);
-
-            // Add a click event listener to the category button
-            button.click(function () {
-                // Filter the "Category" column to show only the clicked category
-                console.log($(this).text());
-                $('#product-table').DataTable().columns(2).search($(this).text()).draw();
+                // Add a click event listener to the category button
+                button.click(function () {
+                    // Filter the "Category" column to show only the clicked category
+                    console.log($(this).text());
+                    $('#product-table').DataTable().columns(2).search($(this).text()).draw();
+                });
+                // Add the button to the categories container element
+                $('#categories').append(button);
             });
-            // Add the button to the categories container element
-            $('#categories').append(button);
-        });
+            // Set the flag variable to true to indicatethat the categories have been loaded
+            categoriesLoaded = true;
 
+        }
 
         // Replace the existing add button with a new one and add an event listener
         const oldAddButton = document.getElementById("add-button");
@@ -203,10 +211,12 @@ async function getData() {
             "delete",
             submitDeleteForm
         );
+
         async function productExists(name, category) {
             const querySnapshotProducts = await getDocs(query(productsRef, where('name', '==', name), where('category', '==', category)));
             return !querySnapshotProducts.empty;
         }
+
         async function submitEditForm() {
             event.preventDefault();
             console.log("Edit form submitted");

@@ -2,8 +2,8 @@ const AUTHORIZE = 'https://accounts.spotify.com/authorize';
 const SPOTIFY_TOKEN_API = 'https://accounts.spotify.com/api/token';
 const redirect_uri = 'https://localhost:7252/Spotify'; // change this to your value
 
-const clientId = "24544591bb2f48f489ace8d0dff1eb0d";
-const clientSecret = "135d4771f44e4b428d56576fb4b73c98";
+const clientId = "66ece2d4f8484e30af4fbce390bae1c9";
+const clientSecret = "491497f6b5774c2ab3ac4b746dead0cb";
 
 // Get the stored access token and refresh token from localStorage
 function getStoredAccessToken() {
@@ -85,6 +85,13 @@ async function authorizeUser() {
             const accessToken = await getAccessToken(code);
             localStorage.setItem('accessTokenSpotify', accessToken);
             setAccessTokenCookie(accessToken);
+            
+            // // Use the updateDoc function to add a new field to the existing document
+            // await updateDoc(cafeDocRef, {
+            //     spotifyAccessToken: accessToken
+            // });
+            // console.log(cafeDocRef)
+            
             initTable();
         }
     } catch (error) {

@@ -27,11 +27,11 @@ const newProductRef = doc(productsRef);
 // Get a reference to the table element
 const table = document.getElementById("product-table");
 
-onAuthStateChanged(auth, user => {
-    if (user) {
-        getData();
-    }
-})
+// onAuthStateChanged(auth, user => {
+//     if (user) {
+//         getData();
+//     }
+// })
 
 async function getUserData() {
     try {
