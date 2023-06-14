@@ -258,7 +258,7 @@ async function getData() {
                 name: newAddForm.elements.name.value,
                 price: Number(newAddForm.elements.price.value),
                 category: newAddForm.elements.category.value,
-                bestSelling: false, // Set bestSelling to false by default
+                isBestSelling: false, // Set bestSelling to false by default
                 imageUrl: newAddForm.elements.imageUrl.value,
             };
             console.log("New product data: ", newData);
@@ -273,6 +273,8 @@ async function getData() {
                 try {
                     // Add the new product data to the Product subcollection of a specific Cafe document with a random ID
                     await setDoc(newProductRef, newData);
+                    await getDoc(newProductRef);
+                    await updateDoc(newProductRef, {id: newProductRef.id});
                     console.log("New product data added successfully");
                     // Close the modal
                     const modal = document.getElementById("add-modal");
